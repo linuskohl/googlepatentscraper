@@ -3,6 +3,7 @@ from typing import Union
 import requests
 from lxml import html
 from lxml.html import HtmlElement
+from requests_html import HTMLSession
 import logging
 
 __author__ = "Linus Kohl"
@@ -10,10 +11,11 @@ __author__ = "Linus Kohl"
 
 class Document():
 
-    def __init__(self, number: str):
+    def __init__(self, number: str, download : bool):
         """
         Args:
             number (str): Hostname
+            download (bool): Download document if true
         Raises:
             InvalidUrl: If hostname is not set
         """
@@ -22,6 +24,9 @@ class Document():
         response = requests.get(url)
         if response.ok:
             self.data = self.__process(response.content)
+            if download == True:
+                status = self.__get_pdf()
+            print(status)
         else:
             raise Exception("Something went wrong getting the document")
 
@@ -250,6 +255,28 @@ class Document():
             citations.append(citation)
         return citations
 
+    def __get_pdf(self, filename: str) -> str:
+        """ Processes xpath queries on the document tree
+        Args:
+            filename (str): PatentNumber for saving pdf
+        Returns:
+            str: status of download or error incase of any connection issues
+        """
+        try:
+            session = HTMLSession()
+            s = session.get(self.url)
+            for link in s.html.links:
+                if ".pdf" in link:
+                    patent_url = link
+                break
+            s = requests.get(patent_url, allow_redirects=True)
+            open(f'{filename}.pdf', 'wb').write(s.content)
+            output = str(f'{filename}.pdf downloaded')
+        except Exception as e:
+            logging.info(f"Error while downloading : {e}")
+            output = str(e)
+        return output
+                    
     def __process(self, content: bytes) -> dict:
         """ Process patent
         Args:

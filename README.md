@@ -18,12 +18,12 @@ pip install googlepatentscraper
 
 ## Usage
 
-### Load document from google patents
+### Load document and download from google patents
 
 ```py
 from googlepatentscraper.document import Document
-
-patent = Document("US8400417B2")
+# set download parameter to download patent document as pdf
+patent = Document("US8400417B2",download = True)
 pprint(patent.data)
 ```
 
