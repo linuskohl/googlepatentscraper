@@ -115,7 +115,11 @@ class Document():
             for claim in self.__get(claim_section, ".//div[@itemprop='content'][1]/*[contains(@class, 'claims')]/*[contains(@class, 'claim')]", many=True):
                 claim_obj = {}
                 claim_obj['dependent'] = True if claim.get('class') == "claim-dependent" else False
-                claim_obj['number'] = int(self.__get(claim, "./div[contains(@class,'claim')][1]/@num"))
+                claim_num = self.__get(claim, "./div[contains(@class,'claim')][1]/@num")
+                if claim_num.isdecimal():
+                    claim_obj['number'] = int(claim_num)
+                else:
+                    continue
                 text = "".join(claim.xpath("./descendant::*/text()"))
                 claim_obj['text'] = text.strip() if text else None
                 claims.append(claim_obj)
