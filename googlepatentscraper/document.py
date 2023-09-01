@@ -59,7 +59,7 @@ class Document():
             list: List containing dictionaries with attributes cpc, first_code
         """
         cpcs = []
-        for element in self.__get(doc, "//li[@itemprop='cpcs']", many=True):
+        for element in self.__get(doc, "//li[@itemprop='classifications']", many=True):
             cpc = {}
             cpc['first_code'] = True if \
                 self.__get(element, ".//meta[@itemprop='FirstCode']/@content") == "true" else False
